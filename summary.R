@@ -409,3 +409,4 @@ qplot(iris$Sepal.Length, iris$Sepal.Width,
 qplot(iris$Sepal.Length, iris$Sepal.Width, 
       color = iris$Species) + 
 geom_smooth(method = "lm")
+
