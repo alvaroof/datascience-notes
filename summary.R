@@ -410,3 +410,12 @@ qplot(iris$Sepal.Length, iris$Sepal.Width,
       color = iris$Species) + 
 geom_smooth(method = "lm")
 
+##how to use generic ggplot
+g <- ggplot(iris, aes(Sepal.Length, Sepal.Width))
+g + geom_point(aes(color = Species), size = 5) +
+    labs(title = "ggplot2 example") +
+    labs(x = expression("log " * PM[2.5]), y = "Width") +
+    geom_smooth(method = "lm") + 
+    facet_grid(. ~ Species) +
+    theme_bw()
+
