@@ -123,9 +123,10 @@ install.packages("XML")
 ##MySQL
 install.packages("RmySQL")
 
-#HDF5
+#Bioconductor
 source("https://www.bioconductor.org/biocLite.R")
 biocLite("rhdf5")
+biocLite("impute")
 
 #Access a lot of foreign data types
 install.packages("foreign")

@@ -610,6 +610,46 @@ plot(colMeans(dataMatrixOrdered), xlab = "Column", ylab = "Column mean", pch = 1
 #D is singular values
 #PCA is the same as SVD, but before decomposing the mean is substracted from
 #each column and then each one is divided by the standar deviation
+set.seed(144)
+dataMatrix <- matrix(rnorm(400), nrow = 40)
+svd1 <- svd(scale(dataMatrix))
+par(mfrow = c(1,3))
+image(t(dataMatrix)[,nrow(dataMatrix):1])
+plot(svd1$u[,1], ylab = "1st left singular vector", xlab = "Rows", pch = 19)
+plot(svd1$v[,1], ylab = "1st right singular vector", xlab = "Columns", pch = 19)
+#D matrix in decomposition comprehends the amount of variance explained
+#by each component.
+par(mfrow = c(1,1))
+plot(svd1$d^2/sum(svd1$d^2), xlab = "Columns or Components",
+     ylab = "Percentage of total variance explained", pch = 19)
+
+#Calculate PCA1 is similar to 1st right singular vector ans so on
+set.seed(144)
+dataMatrix <- matrix(rnorm(400), nrow = 40)
+pca1 <- prcomp(dataMatrix, scale = TRUE)
+
+#Creating an artifical pattern (actually two) to prove the previous methods
+set.seed(144)
+for(i in 1:40){
+    #flip a coin
+    flip1 <- rbinom(1, size = 1, prob = 0.5)
+    flip2 <- rbinom(1, size = 1, prob = 0.5)
+    #if coin is head, add a common pattern to that row
+    if(flip1){
+        dataMatrix[i,] <- dataMatrix[i,] + rep(c(0,5), each = 5)
+    }
+    if(flip2){
+        dataMatrix[i,] <- dataMatrix[i,] + rep(c(0,5), each = 5)
+    }
+}
+hh <- hclust(dist(dataMatrix))
+dataMatrixOrdered <- dataMatrix[hh$order,]
 
 
-
+#handling missing values in svd or pca
+library(impute)
+set.seed(144)
+dataMatrixNA <- matrix(rnorm(400), nrow = 40)
+dataMatrixNA[sample(1:100, size = 40, replace = FALSE)] <- NA
+#use k-nearest neighbors to do the imputation of NA values in rows
+dataMatrix <- impute.knn(dataMatrixNA, k = 5)$data 
