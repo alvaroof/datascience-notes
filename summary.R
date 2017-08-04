@@ -40,7 +40,6 @@ is.na()
 is.nan()
 typeof()
 class()
-#LOAD DATA
 read.table()
 read.csv()
 readLines()
@@ -398,6 +397,46 @@ summarize(rank_groups, mean = mean(rank, na.rm = TRUE))
 cutpoints <- quantile(df2$rank, seq(0,1,length=5), na.rm = TRUE)
 df2$quantile <- cut(df2$rank, cutpoints)
 
+##EDITING TEXT VARIABLES
+txt <- c("AlVAro", "FOO", "F Fo fef ,,,//", "Variable.Name1")
+tolower(txt) #make all letters lowercase
+toupper(txt) #make all letters uppercase
+strsplit(txt, "\\.") #split strings by pattern
+sub("F","_therewasanFhere_",txt) #replace first ocurrence
+gsub("F","_therewasanFhere_",txt) #replace all matches
+grep("FOO", txt) #return position of elements where match occurs
+grep("FOO", txt, value=TRUE) #returns the actual elements
+grepl("FOO", txt) #return boolean vector
+nchar(txt) #number of characters
+substr(txt, 1,3) #three first letters
+paste(txt[1],txt[2],sep = "_pasting_") #combines two strings
+paste0(txt[1],txt[2]) #pastes without space
+trimws(txt) #removes leading and trailing spaces
+
+##REGULAR EXPRESSIONS
+# ^:beginning of line
+# $:end of line
+# [Bb][Uu][Ss][Hh]: set of characters
+# [0-9][a-z][A-Z][0-9a-z]: range of characters
+# [^a-z]: NOT a-z
+# .:any single character
+# blood|fire: or character (match blood or fire)
+# ( and ): as in programming
+# [a-z]?: this expression is 'optional'
+# (.*): any number of repetitions of any character, including none (*? is ungreedy)
+# .+: same as before but at least one repetition
+#{m,n}: restrict matches to m to n occurences
+# {m,} at least m matches
+
+##WORKING WITH DATES
+library(lubridate) #convert any numbers to date. there are functions for times as well
+dat <- "14::03::12"
+ydm(dat)
+dmy(dat)
+#ultimately yiou want your dates to be of class POSIXlt or pOSIXct
+
+
+
 
 #####################################################################
 ##EXPLORATORY DATA ANALYSIS
@@ -508,6 +547,8 @@ qplot(iris$Sepal.Length, iris$Sepal.Width,
 geom_smooth(method = "lm")
 
 ##how to use generic ggplot
+
+g <- ggplot(iris, aes(Sepal.Length, Sepal.Width))
 
 g + geom_point(aes(color = Species), size = 5) +
     labs(title = "ggplot2 example") +
@@ -653,3 +694,32 @@ dataMatrixNA <- matrix(rnorm(400), nrow = 40)
 dataMatrixNA[sample(1:100, size = 40, replace = FALSE)] <- NA
 #use k-nearest neighbors to do the imputation of NA values in rows
 dataMatrix <- impute.knn(dataMatrixNA, k = 5)$data 
+
+
+##USING COLORS IN R
+#good for interpolate between colors
+palette <- colorRamp(c("red", "green")) #◙extremes of the defined palette
+palette(seq(0,1,len=10))
+palette2 <- colorRampPalette(c("red", "green"))
+palette2(10)
+
+#good for choosing colors
+require("RColorBrewer")
+newcolors <- brewer.pal(3, "BuGn") #look for palette names in help page
+newcolors
+newpalette <- colorRampPalette(newcolors)
+image(volcano, col = newpalette(5))
+
+#for plotting many many points
+#option1
+x <- rnorm(10000)
+y <- rnorm(10000)
+smoothScatter(x,y)
+#option2
+plot(x,y,col=rgb(0,0,0,0.2)) #last parameter is alpha parameter
+
+
+#rgb function allows you to choose exactly the color you want
+
+
+
