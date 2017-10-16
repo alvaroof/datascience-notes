@@ -58,6 +58,7 @@ final <- read.table("data.txt", colClasses = classes)
 #To roughly calculate the size of a dataset in memory (RAM) -- rowsxcolumnsx(storage/datatype) [8 bytes/numeric]
 #As a rule of thumb, it will be required twice as much memory
 #e.g. 1.5m rows 120columns numeric is gonna require 1.34GBx2 = 2.7Gb of RAM
+object.size(iris)
 
 #EXPORT DATA
 write.table()
@@ -475,6 +476,10 @@ text()
 mtext()
 axis()
 
+pairs(iris)
+plot(iris[,1:4]) #multi plot
+
+
 example(points) #to see examples of use
 
 ##PLOTTING
@@ -722,4 +727,52 @@ plot(x,y,col=rgb(0,0,0,0.2)) #last parameter is alpha parameter
 #rgb function allows you to choose exactly the color you want
 
 
+#####################################################################
+##REPRODUCIBLE RESEARCH
+#####################################################################
 
+sessionInfo() #this is good for keeping reproducibility across PCs
+set.seed() #mandatory for random simulations
+
+
+#####################################################################
+##STATISTICAL INFERENCE
+#####################################################################
+
+#CONFIDENCE INTERVALS
+library(datasets); data("ChickWeight"); library(reshape2)
+wideCW <- dcast(ChickWeight, Diet + Chick ~ Time, value.var = "weight")
+
+wideCW$gain <- wideCW['21'] - wideCW['0']
+
+wideCW14 <- subset(wideCW, wideCW$Diet %in% c(1,4))
+
+#calculate confidence interval
+t.test(gain ~ Diet, paired = FALSE, var.equal = TRUE, data = wideCW14)$conf
+#paired represents if the subject are the same individuals in the two groups
+#var.equal represents if the variance is the same in both groups
+
+#HYPOTHESIS TESTING
+data(father.son)
+t.test(father.son$sheight-father.son$fheight)
+#to perform a t hypothesis test, in this case, that the height of both father 
+#and son is the same
+
+#to caluclate p-values,since we want the upper tails we use the lower.tail=FALSE
+pbinom(6,8,0.5,lower.tail = FALSE)
+
+#different and independent groups via T test (equal variances)
+nx=10
+ny=10
+sp <- sqrt((9*0.60^2+9*0.68^2)/(10+10-2))
+5-3+ c(-1,1)*qt(0.975,18)*sp*(1/10+1/10)^0.5
+
+#different and independent groups via T test (unequal variances)
+6-4+c(-1,1)*qnorm(0.975)*(0.5^2/100+2^2/100)^0.5
+
+
+##POWER AND TYPE II ERROR
+library(manipulate)
+power.t.test(delta = 2,sd = 1, sig.level = 0.05, 
+             power = 0.95, type = "one.sample", alt = "one.sided") #if you omit one argument it solves for it
+#╢in power, the only parameter important is the effecgt size = (mu2-mu1)/sd

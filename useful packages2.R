@@ -131,3 +131,5 @@ biocLite("impute")
 #Access a lot of foreign data types
 install.packages("foreign")
 
+#clustering categorical variables
+install.packages("klaR")
