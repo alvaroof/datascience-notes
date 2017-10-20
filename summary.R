@@ -776,3 +776,157 @@ library(manipulate)
 power.t.test(delta = 2,sd = 1, sig.level = 0.05, 
              power = 0.95, type = "one.sample", alt = "one.sided") #if you omit one argument it solves for it
 #╢in power, the only parameter important is the effecgt size = (mu2-mu1)/sd
+
+
+##MULTIPLE COMPARISONS
+#we need to adjust out significance level or our pvalues if we do multiple tests
+#like in the comic from xkcd about jelly beans and p<0.05...
+#in this script we adjust the p values. for notes about adjusting the alpha values 
+#please refer to the course slides
+
+
+#we generate 1000 random datasets
+set.seed(42)
+pValues <- rep(NA,1000)
+for(i in 1:1000){
+    y <- rnorm(20)
+    x <- rnorm(20)
+    pValues[i] <- summary(lm(y~x))$coeff[2,4]
+}
+alpha <- 0.05
+
+#we can see that we have 57 false positives (about 5%)
+sum(pValues < alpha)
+#and now we test different kinds of control types
+
+#Controls FWER - Bonferroni correction - 
+#very conservative - no false positives but some false negatives
+sum(p.adjust(pValues, method = "bonferroni")<alpha)
+
+#Controls FDR - Benjamini Hochberg correction
+#less conservative than bonferroni - less false positives
+sum(p.adjust(pValues, method = "BH")<alpha)
+
+
+##RESAMPLING
+#bootstrap
+library(UsingR)
+data(father.son)
+x <- father.son$sheight
+n <- length(x)
+B <- 10000
+resamples <- matrix(sample(x,n*B, replace = TRUE), B, n)
+resampledMedians <- apply(resamples, 1, median)
+#if we plot the last object we will see the distribution for the empirical median
+g = ggplot(data.frame(medians = resampledMedians), aes(x= medians))
+g = g + geom_histogram(color="black", fill="lightblue", binwidth = 0.05)
+g 
+sd(resampledMedians)
+quantile(resampledMedians, c(0.025,0.975)) #to calculate the confidence interval
+#there are some corrections to this in the package bootstrap
+
+
+##permutation tests - group comparisons
+##there are several variations for permutation tests
+library(UsingR)
+data(InsectSprays)
+subdata <- InsectSprays[InsectSprays$spray %in% c("B","C"),]
+y <- subdata$count
+group <- as.character(subdata$spray)
+testStat <- function(w,g){mean(w[g=="B"])-mean(w[g=="C"])}
+observedStat <- testStat(y,group)
+permutations <- sapply(1:10000, function(i) testStat(y, sample(group)))
+observedStat
+mean(permutations > observedStat) #as this is zero we reject the null hypothesis
+
+#####################################################################
+##REGRESSION 
+#####################################################################
+#least squares for the function
+myfun <- function(mu){
+    x <- c(0.18, -1.54, 0.42, 0.95)
+    w <- c(2, 1, 3, 1)
+    sum(w*(x-mu)^2)
+}
+optim(0.5, myfun)$par
+
+#regression through the origin
+x <- c(0.8, 0.47, 0.51, 0.73, 0.36, 0.58, 0.57, 0.85, 0.44, 0.42)
+y <- c(1.39, 0.72, 1.55, 0.48, 1.19, -1.59, 1.23, -0.65, 1.49, 0.05)
+lm(I(y) ~ 0+ I(x)) ##the 0 or minus 1 is used in R formulas to declare that the intercept is cero
+#This I() statement inside the lm function serves to do arithmetical
+#operations insede the function call
+
+
+#residuals
+library(UsingR)
+data(diamond)
+y <- diamond$price; x<-diamond$carat; n<- length(y)
+fit <- lm(y~x)
+e <- resid(fit) ##same as y-predict(fit)
+yhat <- predict(fit)
+sum(e) ##sum of residuals is zero (if model has intercept)
+sum(e*x) ##has also to be zero
+
+##plot points, fit and residuals
+plot(x,y,bg="lightblue", col="black", pch=21, frame=FALSE)
+abline(fit, lwd=2)
+for(i in 1:n){
+    lines(c(x[i],x[i]),c(y[i],yhat[i]), col="red", lwd=2)
+}
+
+#let's plot residuals versus x in horizontal axis, easier to evaluate
+plot(x,e,bg="lightblue", col="black", pch=21, frame=FALSE)
+abline(h=0)
+for(i in 1:n){
+    lines(c(x[i],x[i]),c(e[i],0), col="red", lwd=2)
+}
+
+##and now with ggplot
+g=ggplot(data.frame(x=x,y=resid(lm(y~x))), aes(x=x,y=y))
+g=g+geom_hline(yintercept = 0, size=2)
+g=g+geom_point(size=7, colour="black", alpha=0.4)
+g=g+geom_point(size=5, colour="red", alpha=0.4)
+g=g+xlab("X")+ylab("Residual")
+g #→it is good for residuals to appear to be randomly distributed . If we detect a pattern
+#, some tendency, it means our model doesn't account for some variations of the dependent var
+
+
+#♥here we compare the variation in residuals against the mean, and agains a lm model
+e = c(resid(lm(y~1)), resid(lm(y~x)))
+fit = factor(c(rep("Int", length(y)), rep("int,slope", length(y))))
+g <- ggplot(data.frame(e=e,fit=fit), aes(y=e,x=fit,fill=fit))
+g=g+geom_dotplot(binaxis = "y", size=2, stackdir = "center", binwidth = 30)
+g
+
+
+#variability in residuals
+#if we include intercept the sum of residuals has to be zero
+#standar deviation of residuals is 
+sd <- sqrt((1/(n-2))*sum(resid(lm(y~x))^2))
+#or
+fit <- lm(y~x)
+summary(fit)$sigma
+
+
+#Inference in regression: how to extract the coefficients
+library(UsingR)
+data(diamond)
+y <- diamond$price; x<-diamond$carat; n<- length(y)
+fit <- lm(y~x)
+coefs <- summary(fit)$coefficients
+#build the confidence interval for the intercept and the slope
+coefs[1,1]+c(-1,1)*qt(.975,df=fit$df)*coefs[1,2]
+coefs[2,1]+c(-1,1)*qt(.975,df=fit$df)*coefs[2,2]
+
+##PREDICTION
+data(mtcars)
+n <- nrow(mtcars)
+fit <- lm(mpg~wt, data=mtcars)
+sigmahat <- sqrt((1/(n-2))*sum(resid(fit)^2))
+pred <- predict(fit, newdata=data.frame(wt=meanwt), interval="prediction")
+conf <- predict(fit, newdata=data.frame(wt=meanwt), interval="confidence")
+# conf is for the confidence interval of the regression line at that point
+# pred is for thje conf interval of the predicted value itself
+# in this example is calculed at the mean
+

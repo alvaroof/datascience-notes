@@ -87,7 +87,7 @@ cor(wine) #Matriz de correlaciones (todas las variables han de ser num)
 abs(cor(wine)) > 7 #Para ver las variables independientes con alta correlación
 
 
-#Realizar Predicciones
+#Realizar ciones
 model4 <- lm(Price ~ AGST + HarvestRain + WinterRain + Age, data = wine)
 predictTest <- predict(model4, newdata=wineTest) #PRedicciones
 predictTest
