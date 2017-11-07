@@ -571,6 +571,24 @@ g + geom_point(aes(color = Species)) +
     facet_grid(Petal.factor ~ Species) +
     theme_bw() 
 
+#boxplot
+library(UsingR)
+data(InsectSprays)
+g <- ggplot(data=InsectSprays, aes(y = InsectSprays$count, x = InsectSprays$spray, color=InsectSprays$spray))
+g + geom_boxplot(outlier.colour="black", outlier.shape=16,
+             outlier.size=2, notch=FALSE)
+
+#for density histograms
+xvalues <- seq(min(sdistribution), max(sdistribution), length=50)
+yvalues <- dnorm(xvalues, mean=1/lambda, sd=(1/lambda/sqrt(n)))
+d1 <- data.frame(x = sdistribution)
+d2 <- data.frame(x = xvalues, y= yvalues)
+g <- ggplot()
+#here is the important line ..density..
+g <- g + geom_histogram(aes(x=x, y=..density..), color="black", fill="antiquewhite2", binwidth=0.5, data = d1)
+g <- g + geom_line(aes(x=x, y=y), colour="red", data=d2)
+g <- g + labs(title = "Comparison to a normal distribution with same mean and sd") + theme_bw() 
+
 
 ##HIERARCHYCAL CLUSTERING
 #let's generate and annotate random data points 

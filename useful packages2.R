@@ -133,3 +133,5 @@ install.packages("foreign")
 
 #clustering categorical variables
 install.packages("klaR")
+
+install.packages("tidyverse")
