@@ -6,6 +6,8 @@
 ########################################################################################################
 
 .libPaths("C:/Datos/RStudio/library")
+setwd("C:/datos")
+source("C:/Datos/Coursera/get_info.R")
 
 #HELP
 ?rnorm
@@ -948,3 +950,52 @@ conf <- predict(fit, newdata=data.frame(wt=meanwt), interval="confidence")
 # pred is for thje conf interval of the predicted value itself
 # in this example is calculed at the mean
 
+
+###REGRESSION MODELS
+##harmonic: Fourier Basis just for sins
+notes4 <- c(261.63,293.66,329.63,349.23,392.00,440.00,493.88,523.25)
+t <- seq(0,2, by=.001); n<- length(t)
+c4 <- sin(2*pi*notes4[1]*t)
+e4 <- sin(2*pi*notes4[3]*t)
+g4 <- sin(2*pi*notes4[6]*t)
+chord <- c4+e4+g4+rnorm(n,0,0.3)
+x <- sapply(notes4,function(freq) sin(2*pi*freq*t))
+fit <- lm(chord ~ x -1)
+plot(notes4,fit$coefficients^2, type = "l", col = "red") #we can see the notes used
+abline(v=notes4)
+#fourier discrete transform: both for sins and cosins
+#this shows the spectrum for the chord
+a <- fft(chord); plot(Re(a)^2, type = "l")
+
+#odds ratio of using autolander comparing headwind to tailwind
+library(MASS)
+shuttle$auto <- as.integer(shuttle$use == "auto")
+fit <- glm(auto ~ wind - 1 , "binomial", shuttle)
+cf <- exp(coef(fit))
+oddsratio <- cf[1]/cf[2]
+oddsratio
+
+#poisson regression
+fit <- glm(count ~spray-1, poisson, InsectSprays)
+cf <- exp(fit$coefficients)
+cf[1]/cf[2]
+
+#poisson regression with an offset
+n <- nrow(InsectSprays)
+deltat <- 0.1
+t <- seq(0.1,(n-1)*deltat+0.1,by = deltat)
+fit <- glm(count ~spray+offset(log(t)), poisson, InsectSprays)
+fit2 <- glm(count ~spray+offset(log(10)+log(t)), poisson, InsectSprays)
+
+#knot methodology // spline
+knots <- c(0)
+splineTerms <- sapply(knots, function(knot) (x>knot)*(x-knot))
+xMat <- cbind(1, x, splineTerms)
+fit <- lm(y ~ xMat - 1)
+yHat <- predict(fit)
+
+#stimated slope
+maxPos <- which.max(x)
+minPos <- which(x == 0)
+len <- maxPos - minPos
+(yHat[maxPos] - yHat[minPos]) / len
