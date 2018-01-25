@@ -999,3 +999,10 @@ maxPos <- which.max(x)
 minPos <- which(x == 0)
 len <- maxPos - minPos
 (yHat[maxPos] - yHat[minPos]) / len
+
+#####################################################################
+##CARET
+#####################################################################
+
+#For caret documentation please go to the script caret.R
+library(caret)
