@@ -135,3 +135,15 @@ install.packages("foreign")
 install.packages("klaR")
 
 install.packages("tidyverse")
+
+
+install.packages("AppliedPredictiveModeling")
+install.packages("ElemStatLearn")
+installed.packages("pgmm")
+install.packages("rpart")
+install.packages("gbm")
+install.packages("lubridate")
+install.packages("forecast")
+install.packages("e1071")
+install.packages("elasticnet")
+install.packages("forecast")
