@@ -1000,3 +1000,24 @@ minPos <- which(x == 0)
 len <- maxPos - minPos
 (yHat[maxPos] - yHat[minPos]) / len
 
+
+#########################################################################
+#SHINY
+#
+#
+#
+#########################################################################
+library(shiny)
+library(miniUI)
+
+mygadget <- function(){
+  ui <- miniPage(
+    gadgetTitleBar("My First Gadget")
+  )
+server <- function(input, output, session){
+  observeEvent(input$done,{
+    stopApp()
+  })
+}
+runGadget(ui, server)
+}
