@@ -1021,3 +1021,57 @@ server <- function(input, output, session){
 }
 runGadget(ui, server)
 }
+
+
+#########################################################################
+#PLOTLY
+#
+#########################################################################
+library(plotly)
+data("mtcars")
+plot_ly(x=mtcars$wt, y=mtcars$mpg, mode = "markers", color = as.factor(mtcars$cyl), size = mtcars$hp)
+
+
+##3d scatter plot
+x = rnorm(100, mean = 0, sd = 10)
+y = rnorm(100)
+z = sin(1:100)
+plot_ly(x=x, y=y, z=z, type = "scatter3d", mode = "markers", color = x)
+
+#line graph
+data("airmiles")
+
+#multiple series
+library(dplyr)
+library(tidyr)
+data("EuStockMarkets")
+stocks <- as.data.frame(EuStockMarkets) %>%
+  gather(index, price) %>%
+  mutate(time = rep(time(EuStockMarkets), 4))
+plot_ly(x=stocks$time, y=stocks$price, color=stocks$index)
+
+#histograms
+plot_ly(x=stocks$price, type="histogram")
+
+#boxplots
+plot_ly(y=stocks$price, color=stocks$index, type="box")
+
+#heatmap
+m <- matrix(rnorm(10000), ncol = 100, nrow = 100)
+plot_ly(z=m, type="heatmap")
+
+#surface
+m2 <- matrix(sort(rnorm(10000)), ncol = 100, nrow = 100)
+plot_ly(z=m2, type="surface")
+
+#integration with ggplot
+#ggplot2
+library(ggplot2)
+gg <- qplot(iris$Sepal.Length, iris$Sepal.Width)
+gg <- ggplotly(gg)
+gg
+
+#post to plotly webpage
+plotly_POST(gg)
+#search in google plot from R to plotly to look how
+#to configure
