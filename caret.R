@@ -182,3 +182,7 @@ library(caret)
 zeroVar <- nearZeroVar(train,saveMetrics=TRUE)
 train <- train[,!zeroVar$nzv]
 test <- test[,!zeroVar$nzv]
+
+##compair pairs, plot
+featurePlot(x = train[,vars], y = train$classe, plot = "pairs")
+

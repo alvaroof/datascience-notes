@@ -1,0 +1,28 @@
+---
+title: "Peer graded assignment #2 - Data Product Course - Cousera"
+author: "Alvaro Ortiz"
+date: 
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Some places to have (and definitely not have) a beer around Barcelona city center . Enjoy.
+
+Status as of `r  format(Sys.time(), "%b %d, %Y")`
+
+```{r, cache=TRUE, echo=FALSE, message=FALSE}
+library(leaflet)
+
+setwd("C:/datos")
+places <- read.csv("places.csv")
+places$col <- ifelse(places$rating > 4.0, "green",ifelse(places$rating > 3.0, "grey","red"))
+
+color_legend <- c("green", "grey", "red")
+label_legend <- c("excellent", "average", "awful")
+
+map <- leaflet(places) %>% addTiles() %>%  addCircleMarkers(color = places$col, label=places$name) %>% addLegend(label = label_legend, colors = color_legend) 
+map
+```

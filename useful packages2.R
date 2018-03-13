@@ -147,3 +147,7 @@ install.packages("forecast")
 install.packages("e1071")
 install.packages("elasticnet")
 install.packages("forecast")
+
+
+#recreate matlab plotting/visualizarion in R
+install.packages("dygraph")

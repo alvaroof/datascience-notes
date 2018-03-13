@@ -9,6 +9,8 @@
 setwd("C:/datos")
 source("C:/Datos/Coursera/get_info.R")
 
+setwd("C:/datos/Coursera/Practical ML/")
+
 #HELP
 ?rnorm
 help(rnorm)
@@ -999,4 +1001,8 @@ maxPos <- which.max(x)
 minPos <- which(x == 0)
 len <- maxPos - minPos
 (yHat[maxPos] - yHat[minPos]) / len
+
+
+
+##SHINY 
 
